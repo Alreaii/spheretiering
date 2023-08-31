@@ -18,12 +18,10 @@ if sphere1name and sphere2name:
     sphere1 = st.text_input(f"{sphere1name} alliance IDs, separate by comma (eg 1584, 7000, 4468)", "")
     sphere2 = st.text_input(f"{sphere2name} alliance IDs, separate by comma (eg 1584, 7000, 4468)", "")
     confirmed = st.button("Submit")
+    sphere1, sphere2 = sphere1.split(","), sphere2.split(",")
 
-#sphere1 = ["1584", "7000", "4468", "2510", "3339", "8777", "877", "8236", "10269", "10498", "9256", "11048", "7484"]
-sphere1, sphere2 = sphere1.split(","), sphere2.split(",")
 sphere1cities = []
 sphere1aas = []
-#sphere2 = ["7450", "6088", "9999", "10000", "11189", "1023", "8343", "5476", "3427", "9961", "1246"] 
 sphere2cities = []
 sphere2aas = []
 
@@ -60,25 +58,25 @@ if confirmed:
     sphere1cities50plus = []
 
     for i in range(len(sphere1cities)):
-        if sphere1cities[i] >= 0 and sphere1cities[i] <= 9:
+        if sphere1cities[i] <= 9:
             sphere1cities0to9.append(sphere1cities[i])
-        elif sphere1cities[i] >= 10 and sphere1cities[i] <= 15:
+        elif sphere1cities[i] <= 15:
             sphere1cities10to15.append(sphere1cities[i])
-        elif sphere1cities[i] >= 16 and sphere1cities[i] <= 21:
+        elif sphere1cities[i] <= 21:
             sphere1cities16to21.append(sphere1cities[i])
-        elif sphere1cities[i] >= 22 and sphere1cities[i] <= 25:
+        elif sphere1cities[i] <= 25:
             sphere1cities22to25.append(sphere1cities[i])
-        elif sphere1cities[i] >= 26 and sphere1cities[i] <= 29:
+        elif sphere1cities[i] <= 29:
             sphere1cities26to29.append(sphere1cities[i])
-        elif sphere1cities[i] >= 30 and sphere1cities[i] <= 35:
+        elif sphere1cities[i] <= 35:
             sphere1cities30to35.append(sphere1cities[i])
-        elif sphere1cities[i] >= 36 and sphere1cities[i] <= 40:
+        elif sphere1cities[i] <= 40:
             sphere1cities36to40.append(sphere1cities[i])
-        elif sphere1cities[i] >= 41 and sphere1cities[i] <= 44:
+        elif sphere1cities[i] <= 44:
             sphere1cities41to44.append(sphere1cities[i])
-        elif sphere1cities[i] >= 45 and sphere1cities[i] <= 49:
+        elif sphere1cities[i] <= 49:
             sphere1cities45to49.append(sphere1cities[i])
-        elif sphere1cities[i] >= 50:
+        else:
             sphere1cities50plus.append(sphere1cities[i])
 
 
@@ -94,25 +92,25 @@ if confirmed:
     sphere2cities50plus = []
 
     for i in range(len(sphere2cities)):
-        if sphere2cities[i] >= 0 and sphere2cities[i] <= 9:
+        if sphere2cities[i] <= 9:
             sphere2cities0to9.append(sphere2cities[i])
-        elif sphere2cities[i] >= 10 and sphere2cities[i] <= 15:
+        elif sphere2cities[i] <= 15:
             sphere2cities10to15.append(sphere2cities[i])
-        elif sphere2cities[i] >= 16 and sphere2cities[i] <= 21:
+        elif sphere2cities[i] <= 21:
             sphere2cities16to21.append(sphere2cities[i])
-        elif sphere2cities[i] >= 22 and sphere2cities[i] <= 25:
+        elif sphere2cities[i] <= 25:
             sphere2cities22to25.append(sphere2cities[i])
-        elif sphere2cities[i] >= 26 and sphere2cities[i] <= 29:
+        elif sphere2cities[i] <= 29:
             sphere2cities26to29.append(sphere2cities[i])
-        elif sphere2cities[i] >= 30 and sphere2cities[i] <= 35:
+        elif sphere2cities[i] <= 35:
             sphere2cities30to35.append(sphere2cities[i])
-        elif sphere2cities[i] >= 36 and sphere2cities[i] <= 40:
+        elif sphere2cities[i] <= 40:
             sphere2cities36to40.append(sphere2cities[i])
-        elif sphere2cities[i] >= 41 and sphere2cities[i] <= 44:
+        elif sphere2cities[i] <= 44:
             sphere2cities41to44.append(sphere2cities[i])
-        elif sphere2cities[i] >= 45 and sphere2cities[i] <= 49:
+        elif sphere2cities[i] <= 49:
             sphere2cities45to49.append(sphere2cities[i])
-        elif sphere2cities[i] >= 50:
+        else:
             sphere2cities50plus.append(sphere2cities[i])
 
 
