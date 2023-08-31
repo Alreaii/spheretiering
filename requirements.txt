@@ -1,0 +1,4 @@
+pnwkit
+numpy
+pandas
+streamlit
