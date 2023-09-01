@@ -117,7 +117,7 @@ if confirmed:
     sphere1citiesdf = pd.DataFrame({"0-9 cities": [len(sphere1cities0to9)], "10-15 cities": [len(sphere1cities10to15)], "16-21 cities": [len(sphere1cities16to21)], "22-25 cities": [len(sphere1cities22to25)], "26-29 cities": [len(sphere1cities26to29)], "30-35 cities": [len(sphere1cities30to35)], "36-40 cities": [len(sphere1cities36to40)], "41-44 cities": [len(sphere1cities41to44)], "45-49 cities": [len(sphere1cities45to49)], "50+ cities": [len(sphere1cities50plus)]})
     sphere1citiesdf = sphere1citiesdf.rename(index={0: {sphere1name}})
 
-    sphere2citiesdf = pd.DataFrame({"0-9 cities": [len(sphere2cities0to9)], "10-15 cities": [len(sphere2cities10to15)], "16-21 cities": [len(sphere2cities16to21)], "22-25 cities": [len(sphere2cities22to25)], "26-29 cities": [len(sphere2cities26to29)], "30-35 cities": [len(sphere2cities30to35)], "36-40 cities": [len(sphere2cities36to40)], "41-44 cities": [len(sphere1cities41to44)], "45-49 cities": [len(sphere1cities45to49)], "50+ cities": [len(sphere1cities50plus)]})
+    sphere2citiesdf = pd.DataFrame({"0-9 cities": [len(sphere2cities0to9)], "10-15 cities": [len(sphere2cities10to15)], "16-21 cities": [len(sphere2cities16to21)], "22-25 cities": [len(sphere2cities22to25)], "26-29 cities": [len(sphere2cities26to29)], "30-35 cities": [len(sphere2cities30to35)], "36-40 cities": [len(sphere2cities36to40)], "41-44 cities": [len(sphere2cities41to44)], "45-49 cities": [len(sphere2cities45to49)], "50+ cities": [len(sphere2cities50plus)]})
     sphere2citiesdf = sphere2citiesdf.rename(index={0: {sphere2name}})
 
     if names:
