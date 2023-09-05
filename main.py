@@ -129,8 +129,8 @@ if confirmed:
         st.write(f"Sphere 2 Alliances: {sphere2aas}")
     st.table(sphere2citiesdf)
 
-    st.write(f"Sphere 1 total cities: {len(sphere1cities)}")
-    st.write(f"Sphere 2 total cities: {len(sphere2cities)}")
+    st.write(f"Sphere 1 total cities: {sum(sphere1cities)}")
+    st.write(f"Sphere 2 total cities: {sum(sphere2cities)}")
 
     st.write(f"Sphere 1 average cities: {numpy.mean(sphere1cities)}")
     st.write(f"Sphere 2 average cities: {numpy.mean(sphere2cities)}")
