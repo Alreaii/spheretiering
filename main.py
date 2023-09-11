@@ -17,6 +17,7 @@ sphere2name = st.text_input("Sphere 2 name", "")
 if sphere1name and sphere2name:
     sphere1 = st.text_input(f"{sphere1name} alliance IDs, separate by comma (eg 1584, 7000, 4468)", "")
     sphere2 = st.text_input(f"{sphere2name} alliance IDs, separate by comma (eg 1584, 7000, 4468)", "")
+    greyvmbutton = st.checkbox("Exclude grey nations and VM nations?")
     confirmed = st.button("Submit")
     sphere1, sphere2 = sphere1.split(","), sphere2.split(",")
 
@@ -28,14 +29,22 @@ sphere2aas = []
 
 if confirmed:
     for i in range(len(sphere1)):
-        allianceNations = kit.query("nations", {"alliance_id": int(sphere1[i])}, "num_cities").get()
+        allianceNations = kit.query("nations", {"alliance_id": int(sphere1[i])}, "num_cities vmode last_active color").get()
         for j in range(len(allianceNations.nations)):
-            sphere1cities.append(allianceNations.nations[j].num_cities)
+            if greyvmbutton:
+                if allianceNations.nations[j].color != "gray" and allianceNations.nations[j].vmode == 0:
+                    sphere1cities.append(allianceNations.nations[j].num_cities)
+            else:
+                sphere1cities.append(allianceNations.nations[j].num_cities)
 
     for i in range(len(sphere2)):
-        allianceNations = kit.query("nations", {"alliance_id": int(sphere2[i])}, "num_cities").get()
+        allianceNations = kit.query("nations", {"alliance_id": int(sphere2[i])}, "num_cities vmode last_active color").get()
         for j in range(len(allianceNations.nations)):
-            sphere2cities.append(allianceNations.nations[j].num_cities)
+            if greyvmbutton:
+                if allianceNations.nations[j].color != "gray" and allianceNations.nations[j].vmode == 0:
+                    sphere2cities.append(allianceNations.nations[j].num_cities)
+            else:
+                sphere2cities.append(allianceNations.nations[j].num_cities)
 
     if names:
         for aa in range(len(sphere1)):
