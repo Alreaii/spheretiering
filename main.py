@@ -1,156 +1,103 @@
 import pnwkit
-import numpy
 import pandas as pd
 import streamlit as st
-
+from scipy.stats import ttest_ind
 
 kit = pnwkit.QueryKit(st.secrets["api_key"])
 
-#list of odoo alliances
 
-names = True
-confirmed = False
+def getAllianceNations(allianceID: int, greyvm: bool) -> list: #returns a list of all nations in an alliance - list of pnwkit.Nation objects
+    allianceNations = kit.query("nations", {"alliance_id": int(allianceID)}, "num_cities vmode last_active color").paginate('nations')
+    cleanedNations = []
+    for nation in allianceNations:
+        if greyvm:
+            if nation.color != "gray" and nation.vmode == 0:
+                cleanedNations.append(nation)
+        else:
+            cleanedNations.append(nation)
+    return cleanedNations
 
-sphere1name = st.text_input("Sphere 1 name", "")
-sphere2name = st.text_input("Sphere 2 name", "")
+def getAllianceCities(allianceID: int, greyvm: bool) -> list: #returns a list of all cities in an alliance
+    allianceNations = getAllianceNations(allianceID, greyvm)
+    allianceCities = []
+    for i in range(len(allianceNations)):
+        allianceCities.append(allianceNations[i].num_cities)
+    # print(sum(allianceCities))
+    return allianceCities
 
-if sphere1name and sphere2name:
-    sphere1 = st.text_input(f"{sphere1name} alliance IDs, separate by comma (eg 1584, 7000, 4468)", "")
-    sphere2 = st.text_input(f"{sphere2name} alliance IDs, separate by comma (eg 1584, 7000, 4468)", "")
-    greyvmbutton = st.checkbox("Exclude grey nations and VM nations?")
-    confirmed = st.button("Submit")
-    sphere1, sphere2 = sphere1.split(","), sphere2.split(",")
+def getSphereCities(sphere: list, greyvm: bool): 
+    sphereCities = []
+    for i in range(len(sphere)):
+        sphereCities.append(getAllianceCities(sphere[i], greyvm))
+    return sphereCities
 
-sphere1cities = []
-sphere1aas = []
-sphere2cities = []
-sphere2aas = []
+def getAlliancesInSphere(sphere: list) -> list: #returns a list of alliance names in a sphere
+    sphereNames = []
+    for i in range(len(sphere)):
+        allianceNames = kit.query("alliances", {"id": int(sphere[i])}, "name").get()
+        sphereNames.append(allianceNames.alliances[0].name)
+    return sphereNames
 
+def sortCities(cities: list) -> list: #returns a list of cities sorted into 10 city brackets
+    cities.sort()
+    brackets = [0 for _ in range(10)]
+    for i in range(len(cities)):
+        if cities[i] >= 46:
+            brackets[9] += 1
+        else:
+            brackets[cities[i] // 5] += 1
+    return brackets
+
+def castToDataframe(cities: list) -> pd.DataFrame:
+    df = pd.DataFrame({"1-5 cities": [cities[0]], "6-10 cities": [cities[1]], "11-15 cities": [cities[2]], "16-20 cities": [cities[3]], "21-25 cities": [cities[4]], "26-30 cities": [cities[5]], "31-35 cities": [cities[6]], "36-40 cities": [cities[7]], "41-45 cities": [cities[8]], "46+ cities": [cities[9]]})
+    return df
+
+def getSphereInput(index):
+    alliance_ids = st.text_input(f"Alliance IDs for Sphere {index + 1} (separate by comma eg 1584, 7000, 4468)", key=f"sphere_{index}_alliance_ids")
+    return alliance_ids.split(",")
+
+def calculate_sphere_statistics(sphere_data):
+    mean_city_distribution_per_sphere = []
+    for _, city_distribution in sphere_data:
+        mean_city_distribution = [count / len(city_distribution) for count in city_distribution]
+        mean_city_distribution_per_sphere.append(mean_city_distribution)
+
+    # Perform Statistical Tests (Optional)
+    statistical_results = []
+    if len(sphere_data) > 1:
+        for i in range(len(sphere_data)):
+            for j in range(i+1, len(sphere_data)):
+                t_statistic, p_value = ttest_ind(mean_city_distribution_per_sphere[i], mean_city_distribution_per_sphere[j])
+                statistical_results.append((i, j, t_statistic, p_value))
+    return statistical_results
+
+num_spheres = st.number_input("How many spheres are you comparing?", value=0, step=1, min_value=0, max_value=10)
+greyvmbutton = st.checkbox("Exclude grey nations and VM nations?")
+
+spheres = []
+if num_spheres > 0:
+    for i in range(num_spheres):
+        spheres.append(getSphereInput(i))
+
+confirmed = st.button("Submit")
 
 if confirmed:
-    for i in range(len(sphere1)):
-        allianceNations = kit.query("nations", {"alliance_id": int(sphere1[i])}, "num_cities vmode last_active color").get()
-        for j in range(len(allianceNations.nations)):
-            if greyvmbutton:
-                if allianceNations.nations[j].color != "gray" and allianceNations.nations[j].vmode == 0:
-                    sphere1cities.append(allianceNations.nations[j].num_cities)
-            else:
-                sphere1cities.append(allianceNations.nations[j].num_cities)
+    sphere_data = []
+    for sphere_id in spheres:
+        alliance_names = getAlliancesInSphere(sphere_id)
+        sphere_cities = getSphereCities(sphere_id, greyvmbutton)
+        sphere_city_distributions = [sortCities(city_distribution) for city_distribution in sphere_cities]
+        total_city_distribution = [sum(x) for x in zip(*sphere_city_distributions)]
+        st.write(f"Sphere {len(sphere_data) + 1} - {alliance_names}")
+        st.table(castToDataframe(total_city_distribution))
+        sphere_data.append((alliance_names, total_city_distribution))
 
-    for i in range(len(sphere2)):
-        allianceNations = kit.query("nations", {"alliance_id": int(sphere2[i])}, "num_cities vmode last_active color").get()
-        for j in range(len(allianceNations.nations)):
-            if greyvmbutton:
-                if allianceNations.nations[j].color != "gray" and allianceNations.nations[j].vmode == 0:
-                    sphere2cities.append(allianceNations.nations[j].num_cities)
-            else:
-                sphere2cities.append(allianceNations.nations[j].num_cities)
-
-    if names:
-        for aa in range(len(sphere1)):
-            allianceNames = kit.query("alliances", {"id": int(sphere1[aa])}, "name").get()
-            sphere1aas.append(allianceNames.alliances[0].name)
-        for aa2 in range(len(sphere2)):
-            allianceNames2 = kit.query("alliances", {"id": int(sphere2[aa2])}, "name").get()
-            sphere2aas.append(allianceNames2.alliances[0].name)
+    for i, (alliance_names, mean_city_distribution) in enumerate(sphere_data): #plot barcharts
+        st.write(f"Sphere {i+1} - {alliance_names}")
+        df = pd.DataFrame({"City Range": [f"{i*5+1}-{(i+1)*5}" for i in range(10)], "Mean City Count": mean_city_distribution})
+        st.bar_chart(df.set_index("City Range"))
 
 
-    sphere1cities0to9 = []
-    sphere1cities10to15 = []
-    sphere1cities16to21 = []
-    sphere1cities22to25 = []
-    sphere1cities26to29 = []
-    sphere1cities30to35 = []
-    sphere1cities36to40 = []
-    sphere1cities41to44 = []
-    sphere1cities45to49 = []
-    sphere1cities50plus = []
 
-    for i in range(len(sphere1cities)):
-        if sphere1cities[i] <= 9:
-            sphere1cities0to9.append(sphere1cities[i])
-        elif sphere1cities[i] <= 15:
-            sphere1cities10to15.append(sphere1cities[i])
-        elif sphere1cities[i] <= 21:
-            sphere1cities16to21.append(sphere1cities[i])
-        elif sphere1cities[i] <= 25:
-            sphere1cities22to25.append(sphere1cities[i])
-        elif sphere1cities[i] <= 29:
-            sphere1cities26to29.append(sphere1cities[i])
-        elif sphere1cities[i] <= 35:
-            sphere1cities30to35.append(sphere1cities[i])
-        elif sphere1cities[i] <= 40:
-            sphere1cities36to40.append(sphere1cities[i])
-        elif sphere1cities[i] <= 44:
-            sphere1cities41to44.append(sphere1cities[i])
-        elif sphere1cities[i] <= 49:
-            sphere1cities45to49.append(sphere1cities[i])
-        else:
-            sphere1cities50plus.append(sphere1cities[i])
-
-
-    sphere2cities0to9 = []
-    sphere2cities10to15 = []
-    sphere2cities16to21 = []
-    sphere2cities22to25 = []
-    sphere2cities26to29 = []
-    sphere2cities30to35 = []
-    sphere2cities36to40 = []
-    sphere2cities41to44 = []
-    sphere2cities45to49 = []
-    sphere2cities50plus = []
-
-    for i in range(len(sphere2cities)):
-        if sphere2cities[i] <= 9:
-            sphere2cities0to9.append(sphere2cities[i])
-        elif sphere2cities[i] <= 15:
-            sphere2cities10to15.append(sphere2cities[i])
-        elif sphere2cities[i] <= 21:
-            sphere2cities16to21.append(sphere2cities[i])
-        elif sphere2cities[i] <= 25:
-            sphere2cities22to25.append(sphere2cities[i])
-        elif sphere2cities[i] <= 29:
-            sphere2cities26to29.append(sphere2cities[i])
-        elif sphere2cities[i] <= 35:
-            sphere2cities30to35.append(sphere2cities[i])
-        elif sphere2cities[i] <= 40:
-            sphere2cities36to40.append(sphere2cities[i])
-        elif sphere2cities[i] <= 44:
-            sphere2cities41to44.append(sphere2cities[i])
-        elif sphere2cities[i] <= 49:
-            sphere2cities45to49.append(sphere2cities[i])
-        else:
-            sphere2cities50plus.append(sphere2cities[i])
-
-
-    sphere1citiesdf = pd.DataFrame({"0-9 cities": [len(sphere1cities0to9)], "10-15 cities": [len(sphere1cities10to15)], "16-21 cities": [len(sphere1cities16to21)], "22-25 cities": [len(sphere1cities22to25)], "26-29 cities": [len(sphere1cities26to29)], "30-35 cities": [len(sphere1cities30to35)], "36-40 cities": [len(sphere1cities36to40)], "41-44 cities": [len(sphere1cities41to44)], "45-49 cities": [len(sphere1cities45to49)], "50+ cities": [len(sphere1cities50plus)]})
-    sphere1citiesdf = sphere1citiesdf.rename(index={0: {sphere1name}})
-
-    sphere2citiesdf = pd.DataFrame({"0-9 cities": [len(sphere2cities0to9)], "10-15 cities": [len(sphere2cities10to15)], "16-21 cities": [len(sphere2cities16to21)], "22-25 cities": [len(sphere2cities22to25)], "26-29 cities": [len(sphere2cities26to29)], "30-35 cities": [len(sphere2cities30to35)], "36-40 cities": [len(sphere2cities36to40)], "41-44 cities": [len(sphere2cities41to44)], "45-49 cities": [len(sphere2cities45to49)], "50+ cities": [len(sphere2cities50plus)]})
-    sphere2citiesdf = sphere2citiesdf.rename(index={0: {sphere2name}})
-
-    if names:
-        st.write(f"Sphere 1 Alliances: {sphere1aas}")
-
-    st.table(sphere1citiesdf)
-
-    if names:
-        st.write(f"Sphere 2 Alliances: {sphere2aas}")
-    st.table(sphere2citiesdf)
-
-    st.write(f"Sphere 1 total cities: {sum(sphere1cities)}")
-    st.write(f"Sphere 2 total cities: {sum(sphere2cities)}")
-
-    st.write(f"Sphere 1 average cities: {numpy.mean(sphere1cities)}")
-    st.write(f"Sphere 2 average cities: {numpy.mean(sphere2cities)}")
-
-    st.write(f"Sphere 1 median cities: {numpy.median(sphere1cities)}")
-    st.write(f"Sphere 2 median cities: {numpy.median(sphere2cities)}")
-
-    st.write(f"Sphere 1 standard deviation cities: {numpy.std(sphere1cities)}")
-    st.write(f"Sphere 2 standard deviation cities: {numpy.std(sphere2cities)}")
-
-    st.write(f"Sphere 1 variance cities: {numpy.var(sphere1cities)}")
-    st.write(f"Sphere 2 variance cities: {numpy.var(sphere2cities)}")
 
 
