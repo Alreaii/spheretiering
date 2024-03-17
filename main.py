@@ -55,15 +55,6 @@ def getSphereInput(index):
     alliance_ids = st.text_input(f"Alliance IDs for Sphere {index + 1} (separate by comma eg 1584, 7000, 4468)", key=f"sphere_{index}_alliance_ids")
     return alliance_ids.split(",")
 
-    # Perform Statistical Tests (Optional)
-    statistical_results = []
-    if len(sphere_data) > 1:
-        for i in range(len(sphere_data)):
-            for j in range(i+1, len(sphere_data)):
-                t_statistic, p_value = ttest_ind(mean_city_distribution_per_sphere[i], mean_city_distribution_per_sphere[j])
-                statistical_results.append((i, j, t_statistic, p_value))
-    return statistical_results
-
 num_spheres = st.number_input("How many spheres are you comparing?", value=0, step=1, min_value=0, max_value=10)
 greyvmbutton = st.checkbox("Exclude grey nations and VM nations?")
 
