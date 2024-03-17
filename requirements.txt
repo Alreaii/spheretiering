@@ -2,3 +2,4 @@ pnwkit
 numpy
 pandas
 streamlit
+scipy.stats
