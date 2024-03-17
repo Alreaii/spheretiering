@@ -92,10 +92,10 @@ if confirmed:
         st.table(castToDataframe(total_city_distribution))
         sphere_data.append((alliance_names, total_city_distribution))
 
-    for i, (alliance_names, mean_city_distribution) in enumerate(sphere_data): #plot barcharts
-        st.write(f"Sphere {i+1} - {alliance_names}")
-        df = pd.DataFrame({"City Range": [f"{i*5+1}-{(i+1)*5}" for i in range(10)], "Mean City Count": mean_city_distribution})
-        st.bar_chart(df.set_index("City Range"))
+    # for i, (alliance_names, mean_city_distribution) in enumerate(sphere_data): #plot barcharts
+    #     st.write(f"Sphere {i+1} - {alliance_names}")
+    #     df = pd.DataFrame({"City Range": [f"{i*5+1}-{(i+1)*5}" for i in range(10)], "Mean City Count": mean_city_distribution})
+    #     st.bar_chart(df.set_index("City Range"))
 
 
 
