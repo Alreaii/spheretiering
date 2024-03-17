@@ -1,7 +1,6 @@
 import pnwkit
 import pandas as pd
 import streamlit as st
-from scipy.stats import ttest_ind
 
 kit = pnwkit.QueryKit(st.secrets["api_key"])
 
