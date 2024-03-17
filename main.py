@@ -56,12 +56,6 @@ def getSphereInput(index):
     alliance_ids = st.text_input(f"Alliance IDs for Sphere {index + 1} (separate by comma eg 1584, 7000, 4468)", key=f"sphere_{index}_alliance_ids")
     return alliance_ids.split(",")
 
-def calculate_sphere_statistics(sphere_data):
-    mean_city_distribution_per_sphere = []
-    for _, city_distribution in sphere_data:
-        mean_city_distribution = [count / len(city_distribution) for count in city_distribution]
-        mean_city_distribution_per_sphere.append(mean_city_distribution)
-
     # Perform Statistical Tests (Optional)
     statistical_results = []
     if len(sphere_data) > 1:
@@ -92,10 +86,10 @@ if confirmed:
         st.table(castToDataframe(total_city_distribution))
         sphere_data.append((alliance_names, total_city_distribution))
 
-    # for i, (alliance_names, mean_city_distribution) in enumerate(sphere_data): #plot barcharts
-    #     st.write(f"Sphere {i+1} - {alliance_names}")
-    #     df = pd.DataFrame({"City Range": [f"{i*5+1}-{(i+1)*5}" for i in range(10)], "Mean City Count": mean_city_distribution})
-    #     st.bar_chart(df.set_index("City Range"))
+    for i, (alliance_names, mean_city_distribution) in enumerate(sphere_data): #plot barcharts
+        st.write(f"Sphere {i+1} - {alliance_names}")
+        df = pd.DataFrame({"City Range": [f"{i*5+1}-{(i+1)*5}" for i in range(10)], "Mean City Count": mean_city_distribution})
+        st.bar_chart(df.set_index("City Range"))
 
 
 
