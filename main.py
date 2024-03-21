@@ -37,18 +37,20 @@ def getAlliancesInSphere(sphere: list) -> list: #returns a list of alliance name
         sphereNames.append(allianceNames.alliances[0].name)
     return sphereNames
 
-def sortCities(cities: list) -> list: #returns a list of cities sorted into 10 city brackets
+def sortCities(cities: list) -> list:
     cities.sort()
-    brackets = [0 for _ in range(10)]
-    for i in range(len(cities)):
-        if cities[i] >= 46:
-            brackets[9] += 1
+    brackets = [0 for _ in range(11)]  # Initialize with length 11
+    for city_count in cities:
+        if city_count >= 51:
+            brackets[10] += 1
         else:
-            brackets[cities[i] // 5] += 1
+            bracket_index = min((city_count - 1) // 5, 9) 
+            brackets[bracket_index] += 1
     return brackets
 
+
 def castToDataframe(cities: list) -> pd.DataFrame:
-    df = pd.DataFrame({"1-5 cities": [cities[0]], "6-10 cities": [cities[1]], "11-15 cities": [cities[2]], "16-20 cities": [cities[3]], "21-25 cities": [cities[4]], "26-30 cities": [cities[5]], "31-35 cities": [cities[6]], "36-40 cities": [cities[7]], "41-45 cities": [cities[8]], "46+ cities": [cities[9]]})
+    df = pd.DataFrame({"1-5 cities": [cities[0]], "6-10 cities": [cities[1]], "11-15 cities": [cities[2]], "16-20 cities": [cities[3]], "21-25 cities": [cities[4]], "26-30 cities": [cities[5]], "31-35 cities": [cities[6]], "36-40 cities": [cities[7]], "41-45 cities": [cities[8]], "46-50 cities": [cities[9]], "51+ cities": [cities[10]]})
     return df
 
 def getSphereInput(index):
@@ -76,11 +78,10 @@ if confirmed:
         st.table(castToDataframe(total_city_distribution))
         sphere_data.append((alliance_names, total_city_distribution))
 
-    for i, (alliance_names, mean_city_distribution) in enumerate(sphere_data): #plot barcharts
+    for i, (alliance_names, mean_city_distribution) in enumerate(sphere_data): # plot barcharts
         st.write(f"Sphere {i+1} - {alliance_names}")
-        df = pd.DataFrame({"City Range": [f"{i*5+1}-{(i+1)*5}" for i in range(10)], "Mean City Count": mean_city_distribution})
+        df = pd.DataFrame({"City Range": ["1-5 cities", "6-10 cities", "11-15 cities", "16-20 cities", "21-25 cities", "26-30 cities", "31-35 cities", "36-40 cities", "41-45 cities", "46-50 cities", "51+ cities"], "Mean City Count": mean_city_distribution})
         st.bar_chart(df.set_index("City Range"))
-
 
 
 
